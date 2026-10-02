@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Pro de Tarifa Freelance & Presupuestos 2026</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2pdf.js for Client-Side PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Navbar Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="calculator" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight text-white flex items-center gap-2">
+                        TarifaFreelance<span class="text-indigo-400">.pro</span>
+                        <span class="text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">Edición 2026</span>
+                    </h1>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <!-- Quick Proposal Generator Modal Trigger -->
+                <button onclick="openProposalModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-all shadow-lg shadow-indigo-600/25 active:scale-95">
+                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Generar Presupuesto PDF</span>
+                </button>
+                
+                <!-- BuyMeACoffee Monetization Link -->
+                <a href="https://www.buymeacoffee.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 text-sm font-medium transition-all">
+                    <i data-lucide="coffee" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">Invítame a un café</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- AdSense Top Leaderboard Banner Placeholder -->
+    <div class="max-w-7xl mx-auto px-4 pt-4 w-full">
+        <div class="bg-slate-900/50 border border-slate-800/80 rounded-xl p-3 text-center text-xs text-slate-500 flex flex-col items-center justify-center min-h-[60px] border-dashed">
+            <span class="uppercase tracking-widest text-[10px] text-slate-600 font-semibold mb-1">Publicidad / AdSense Banner (728x90)</span>
+            <p class="text-slate-400">Espacio optimizado para anuncios contextuales de Google AdSense</p>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- Left Sidebar: Input Parameters Form (5 Cols) -->
+        <section class="lg:col-span-5 space-y-6">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
+                        Parámetros Financieros
+                    </h2>
+                    <button onclick="resetDefaults()" class="text-xs text-slate-400 hover:text-slate-200 underline flex items-center gap-1">
+                        <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Restablecer
+                    </button>
+                </div>
+
+                <!-- Form Controls -->
+                <form id="calcForm" onsubmit="event.preventDefault();" class="space-y-5">
+                    
+                    <!-- Desired Net Monthly Income -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex justify-between">
+                            <span>Sueldo Neto Mensual Deseado</span>
+                            <span class="text-indigo-400 font-bold" id="valNetMonthlyDisplay">2.500 €</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-medium">€</span>
+                            <input type="number" id="desiredNetMonthly" value="2500" min="500" step="100" class="w-full bg-slate-800/80 border border-slate-700 text-slate-100 rounded-xl pl-8 pr-4 py-2.5 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none font-semibold">
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">Lo que quieres ingresar limpio en tu cuenta bancaria cada mes.</p>
+                    </div>
+
+                    <!-- Fixed Monthly Expenses & Software -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex justify-between">
+                            <span>Gastos Fijos Operativos / Mes</span>
+                            <span class="text-indigo-400 font-bold" id="valExpensesDisplay">350 €</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-medium">€</span>
+                            <input type="number" id="monthlyExpenses" value="350" min="0" step="50" class="w-full bg-slate-800/80 border border-slate-700 text-slate-100 rounded-xl pl-8 pr-4 py-2.5 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none font-semibold">
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">Software, dominio, gestoría, fibra, móvil, coworking, etc.</p>
+                    </div>
+
+                    <!-- Cuota Autónomos / Social Security -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex justify-between">
+                            <span>Cuota de Autónomos / Seg. Social</span>
+                            <span class="text-indigo-400 font-bold" id="valCuotaDisplay">290 €</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 font-medium">€</span>
+                            <input type="number" id="cuotaAutonomos" value="290" min="0" step="10" class="w-full bg-slate-800/80 border border-slate-700 text-slate-100 rounded-xl pl-8 pr-4 py-2.5 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none font-semibold">
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">Ajustado al sistema de cotización por ingresos reales 2026.</p>
+                    </div>
+
+                    <!-- Taxes / IRPF Percentage -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex justify-between">
+                            <span>Retención / IRPF Estimado (%)</span>
+                            <span class="text-indigo-400 font-bold" id="valTaxDisplay">20 %</span>
+                        </label>
+                        <div class="relative">
+                            <input type="range" id="taxPercentage" min="7" max="45" value="20" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                        </div>
+                        <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+                            <span>7% (Nuevos autónomos)</span>
+                            <span>15% (Estándar)</span>
+                            <span>25%+ (Altos ingresos)</span>
+                        </div>
+                    </div>
+
+                    <!-- Billable Hours & Time Settings Grid -->
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                                Semanas Vacaciones / Baja
+                            </label>
+                            <input type="number" id="vacationWeeks" value="4" min="0" max="12" class="w-full bg-slate-800/80 border border-slate-700 text-slate-100 rounded-xl px-3.5 py-2.5 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+                                Horas Trabajo / Semana
+                            </label>
+                            <input type="number" id="weeklyHours" value="40" min="10" max="80" class="w-full bg-slate-800/80 border border-slate-700 text-slate-100 rounded-xl px-3.5 py-2.5 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none font-semibold">
+                        </div>
+                    </div>
+
+                    <!-- % Billable Hours Ratio -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex justify-between">
+                            <span>% Horas Realmente Facturables</span>
+                            <span class="text-indigo-400 font-bold" id="valBillableRatioDisplay">70 %</span>
+                        </label>
+                        <div class="relative">
+                            <input type="range" id="billableRatio" min="40" max="95" value="70" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">El resto del tiempo se pierde en administración, reuniones no cobradas y ventas.</p>
+                    </div>
+
+                    <!-- Safety Profit Margin -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex justify-between">
+                            <span>Margen de Beneficio / Fondo Imprevistos</span>
+                            <span class="text-indigo-400 font-bold" id="valMarginDisplay">15 %</span>
+                        </label>
+                        <div class="relative">
+                            <input type="range" id="profitMargin" min="0" max="40" value="15" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">Colchón extra para reinversión, impagos o meses de baja facturación.</p>
+                    </div>
+
+                </form>
+            </div>
+        </section>
+
+        <!-- Right Column: Interactive Results & Visual Charts (7 Cols) -->
+        <section class="lg:col-span-7 space-y-6">
+            
+            <!-- Hero Results Dashboard Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Recommended Hourly Rate -->
+                <div class="bg-gradient-to-br from-indigo-900/40 via-slate-900 to-slate-900 border border-indigo-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all"></div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Tarifa Hora Recomendada</span>
+                        <div class="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+                            <i data-lucide="clock" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="resHourlyRate" class="text-3xl sm:text-4xl font-black text-white tracking-tight">0,00 €</span>
+                        <span class="text-xs text-slate-400 font-medium">/ hora</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2 flex items-center gap-1">
+                        <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i> Incluye tu margen de beneficio deseado.
+                    </p>
+                </div>
+
+                <!-- Daily Rate -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Tarifa Diaria (Jornada)</span>
+                        <div class="p-2 bg-slate-800 rounded-lg text-slate-300">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="resDailyRate" class="text-3xl sm:text-4xl font-black text-white tracking-tight">0,00 €</span>
+                        <span class="text-xs text-slate-400 font-medium">/ día</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2">Calculado para jornadas estándar de 8 horas.</p>
+                </div>
+
+                <!-- Minimum Hourly Break-Even Rate -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Tarifa Hora Mínima (Suelo)</span>
+                        <div class="p-2 bg-amber-500/10 rounded-lg text-amber-400">
+                            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="resMinHourlyRate" class="text-2xl font-bold text-amber-400">0,00 €</span>
+                        <span class="text-xs text-slate-400">/ hora</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1">Nunca cobres por debajo de esto o perderás dinero.</p>
+                </div>
+
+                <!-- Annual Required Gross Turnover -->
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Facturación Bruta Anual</span>
+                        <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
+                            <i data-lucide="trending-up" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span id="resAnnualGross" class="text-2xl font-bold text-emerald-400">0,00 €</span>
+                        <span class="text-xs text-slate-400">/ año</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1">Objetivo mínimo de facturación en tus facturas emitidas.</p>
+                </div>
+
+            </div>
+
+            <!-- Graphical Financial Breakdown (Donut Chart) -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-400"></i>
+                        Desglose Anual de tu Facturación
+                    </h3>
+                    <span class="text-xs text-slate-400" id="resBillableHoursTotal">0h facturables / año</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <div class="md:col-span-6 h-56 relative flex items-center justify-center">
+                        <canvas id="financialChart"></canvas>
+                    </div>
+                    <div class="md:col-span-6 space-y-3 text-xs">
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
+                            <span class="flex items-center gap-2 text-slate-300">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                                Sueldo Neto Anual
+                            </span>
+                            <span id="breakdownNet" class="font-bold text-white">0 €</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
+                            <span class="flex items-center gap-2 text-slate-300">
+                                <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                                Impuestos / IRPF
+                            </span>
+                            <span id="breakdownTaxes" class="font-bold text-white">0 €</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
+                            <span class="flex items-center gap-2 text-slate-300">
+                                <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                                Gastos + Cuota Autónomos
+                            </span>
+                            <span id="breakdownExpenses" class="font-bold text-white">0 €</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
+                            <span class="flex items-center gap-2 text-slate-300">
+                                <span class="w-3 h-3 rounded-full bg-indigo-500 inline-block"></span>
+                                Margen / Colchón
+                            </span>
+                            <span id="breakdownMargin" class="font-bold text-white">0 €</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommended Affiliate Tools Section (Monetization Engine) -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950/30 to-slate-900 border border-indigo-500/20 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-indigo-400"></i>
+                        Herramientas Recomendadas para Autónomos (2026)
+                    </h3>
+                    <span class="text-[10px] text-slate-500 uppercase">Patrocinado</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    
+                    <a href="https://www.holded.com" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 rounded-xl transition-all group block">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-xs text-white group-hover:text-indigo-400 transition-colors">Holded ERP</span>
+                            <i data-lucide="external-link" class="w-3 h-3 text-slate-500 group-hover:text-indigo-400"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-snug">Facturación e impuestos automáticos sin líos.</p>
+                    </a>
+
+                    <a href="https://www.revolut.com" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 rounded-xl transition-all group block">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-xs text-white group-hover:text-indigo-400 transition-colors">Revolut Business</span>
+                            <i data-lucide="external-link" class="w-3 h-3 text-slate-500 group-hover:text-indigo-400"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-snug">Cuenta de empresa sin comisiones y multidivisa.</p>
+                    </a>
+
+                    <a href="https://www.notion.so" target="_blank" rel="noopener noreferrer" class="p-3 bg-slate-900/80 border border-slate-800 hover:border-indigo-500/50 rounded-xl transition-all group block">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-xs text-white group-hover:text-indigo-400 transition-colors">Notion Workspace</span>
+                            <i data-lucide="external-link" class="w-3 h-3 text-slate-500 group-hover:text-indigo-400"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-400 leading-snug">Organiza tus proyectos y CRM de clientes.</p>
+                    </a>
+
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Proposal / Budget PDF Generator Modal -->
+    <div id="proposalModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="file-check" class="w-5 h-5 text-indigo-400"></i>
+                    <h3 class="font-bold text-white text-base">Generador de Presupuesto Exprés en PDF</h3>
+                </div>
+                <button onclick="closeProposalModal()" class="text-slate-400 hover:text-white transition-colors p-1 rounded-lg">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Grid -->
+            <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-12 gap-6">
+                
+                <!-- Left Column: Proposal Inputs (5 Cols) -->
+                <div class="md:col-span-5 space-y-4 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Tu Nombre / Marca Freelance</label>
+                        <input type="text" id="propFreelanceName" value="Alex Dev - Consultoría Digital" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Nombre del Cliente / Empresa</label>
+                        <input type="text" id="propClientName" value="Acme Corp S.L." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Concepto o Proyecto</label>
+                        <input type="text" id="propProjectTitle" value="Desarrollo Web & Automatización IA" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Horas Estimadas</label>
+                            <input type="number" id="propHours" value="35" min="1" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-300 mb-1">Precio / Hora (€)</label>
+                            <input type="number" id="propRate" value="45" min="1" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-300 mb-1">Notas / Validez de Oferta</label>
+                        <textarea id="propNotes" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white outline-none focus:border-indigo-500">Presupuesto válido por 15 días. Pago 50% por adelantado y 50% al finalizar la entrega.</textarea>
+                    </div>
+                </div>
+
+                <!-- Right Column: Document Preview (7 Cols) -->
+                <div class="md:col-span-7 bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-slate-500 block mb-2">Vista Previa del Documento</span>
+                        
+                        <!-- Printable Paper Area -->
+                        <div id="pdfPaper" class="bg-white text-slate-900 p-6 rounded-lg shadow-lg text-xs space-y-4">
+                            <div class="flex justify-between items-start border-b border-slate-200 pb-3">
+                                <div>
+                                    <h2 class="font-bold text-base text-indigo-900" id="prevFreelance">Alex Dev</h2>
+                                    <p class="text-[10px] text-slate-500">Presupuesto Profesional 2026</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="font-bold text-slate-700 block">PRESUPUESTO</span>
+                                    <span class="text-[10px] text-slate-500" id="prevDate">02/10/2026</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 p-3 rounded border border-slate-100">
+                                <span class="text-[10px] text-slate-400 font-semibold uppercase block">Preparado para:</span>
+                                <span class="font-bold text-slate-800 text-sm" id="prevClient">Acme Corp</span>
+                            </div>
+
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-semibold uppercase block mb-1">Servicios:</span>
+                                <p class="font-semibold text-slate-800" id="prevTitle">Desarrollo Web</p>
+                            </div>
+
+                            <table class="w-full text-left border-collapse mt-2">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-[10px] uppercase text-slate-400">
+                                        <th class="py-1">Horas</th>
+                                        <th class="py-1">Precio/H</th>
+                                        <th class="py-1 text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-slate-700">
+                                    <tr class="border-b border-slate-100">
+                                        <td class="py-1.5 font-medium" id="prevHours">35 h</td>
+                                        <td class="py-1.5" id="prevRate">45 €</td>
+                                        <td class="py-1.5 text-right font-bold text-slate-900" id="prevTotal">1.575 €</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="text-right pt-2 border-t border-slate-200">
+                                <span class="text-xs text-slate-500">Total Estimado (Sin IVA): </span>
+                                <span class="text-base font-black text-indigo-700" id="prevFinalTotal">1.575 €</span>
+                            </div>
+
+                            <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-100" id="prevNotes">
+                                Presupuesto válido por 15 días.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex justify-end gap-3">
+                        <button onclick="downloadPDF()" class="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            Descargar Presupuesto PDF
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="border-t border-slate-800 bg-slate-900/60 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-4">
+            
+            <!-- AdSense Bottom Banner Placeholder -->
+            <div class="max-w-4xl mx-auto bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-center text-xs text-slate-500 flex flex-col items-center justify-center min-h-[70px] border-dashed">
+                <span class="uppercase tracking-widest text-[10px] text-slate-600 font-semibold mb-1">Publicidad / AdSense Banner (728x90)</span>
+                <p class="text-slate-400">Espacio publicitario inferior para ingresos pasivos con Google AdSense</p>
+            </div>
+
+            <p class="text-xs text-slate-500">
+                &copy; 2026 TarifaFreelance.pro &mdash; Micro-SaaS 100% Gratuito y Automatizado.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Application JavaScript Engine -->
+    <script>
+        // DOM Input References
+        const desiredNetMonthlyInput = document.getElementById('desiredNetMonthly');
+        const monthlyExpensesInput = document.getElementById('monthlyExpenses');
+        const cuotaAutonomosInput = document.getElementById('cuotaAutonomos');
+        const taxPercentageInput = document.getElementById('taxPercentage');
+        const vacationWeeksInput = document.getElementById('vacationWeeks');
+        const weeklyHoursInput = document.getElementById('weeklyHours');
+        const billableRatioInput = document.getElementById('billableRatio');
+        const profitMarginInput = document.getElementById('profitMargin');
+
+        // Display Badge References
+        const valNetMonthlyDisplay = document.getElementById('valNetMonthlyDisplay');
+        const valExpensesDisplay = document.getElementById('valExpensesDisplay');
+        const valCuotaDisplay = document.getElementById('valCuotaDisplay');
+        const valTaxDisplay = document.getElementById('valTaxDisplay');
+        const valBillableRatioDisplay = document.getElementById('valBillableRatioDisplay');
+        const valMarginDisplay = document.getElementById('valMarginDisplay');
+
+        // Result Output References
+        const resHourlyRate = document.getElementById('resHourlyRate');
+        const resDailyRate = document.getElementById('resDailyRate');
+        const resMinHourlyRate = document.getElementById('resMinHourlyRate');
+        const resAnnualGross = document.getElementById('resAnnualGross');
+        const resBillableHoursTotal = document.getElementById('resBillableHoursTotal');
+
+        const breakdownNet = document.getElementById('breakdownNet');
+        const breakdownTaxes = document.getElementById('breakdownTaxes');
+        const breakdownExpenses = document.getElementById('breakdownExpenses');
+        const breakdownMargin = document.getElementById('breakdownMargin');
+
+        let chartInstance = null;
+
+        // Currency Formatter Utility
+        const formatEuro = (amount) => {
+            return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(amount);
+        };
+
+        // Main Calculation Function
+        function calculateRates() {
+            const desiredNetMonthly = parseFloat(desiredNetMonthlyInput.value) || 0;
+            const monthlyExpenses = parseFloat(monthlyExpensesInput.value) || 0;
+            const cuotaAutonomos = parseFloat(cuotaAutonomosInput.value) || 0;
+            const taxPercentage = parseFloat(taxPercentageInput.value) || 0;
+            const vacationWeeks = parseFloat(vacationWeeksInput.value) || 0;
+            const weeklyHours = parseFloat(weeklyHoursInput.value) || 0;
+            const billableRatio = parseFloat(billableRatioInput.value) || 0;
+            const profitMargin = parseFloat(profitMarginInput.value) || 0;
+
+            // Update UI Slider Badges
+            valNetMonthlyDisplay.textContent = formatEuro(desiredNetMonthly);
+            valExpensesDisplay.textContent = formatEuro(monthlyExpenses);
+            valCuotaDisplay.textContent = formatEuro(cuotaAutonomos);
+            valTaxDisplay.textContent = taxPercentage + ' %';
+            valBillableRatioDisplay.textContent = billableRatio + ' %';
+            valMarginDisplay.textContent = profitMargin + ' %';
+
+            // Time Math
+            const workingWeeks = Math.max(1, 52 - vacationWeeks);
+            const totalHoursYear = workingWeeks * weeklyHours;
+            const billableHoursYear = totalHoursYear * (billableRatio / 100);
+
+            // Annual Target Net Income
+            const annualTargetNet = desiredNetMonthly * 12;
+
+            // Annual Overhead Costs
+            const annualExpenses = (monthlyExpenses + cuotaAutonomos) * 12;
+
+            // Gross Revenue Required Before Taxes
+            // Net = Gross * (1 - TaxRate) - Overhead  =>  Gross = (Net + Overhead) / (1 - TaxRate)
+            const taxFactor = 1 - (taxPercentage / 100);
+            const annualGrossRequired = taxFactor > 0 ? (annualTargetNet / taxFactor) + annualExpenses : 0;
+
+            // Hourly Rates
+            const minHourlyRate = billableHoursYear > 0 ? annualGrossRequired / billableHoursYear : 0;
+            const recommendedHourlyRate = minHourlyRate * (1 + (profitMargin / 100));
+            const dailyRate = recommendedHourlyRate * (weeklyHours / 5);
+
+            // Cost Breakdowns for Chart
+            const annualTaxes = (annualGrossRequired - annualExpenses) * (taxPercentage / 100);
+            const annualMarginAmount = (recommendedHourlyRate - minHourlyRate) * billableHoursYear;
+
+            // Render Output Text
+            resHourlyRate.textContent = formatEuro(recommendedHourlyRate);
+            resDailyRate.textContent = formatEuro(dailyRate);
+            resMinHourlyRate.textContent = formatEuro(minHourlyRate);
+            resAnnualGross.textContent = formatEuro(annualGrossRequired + annualMarginAmount);
+            resBillableHoursTotal.textContent = Math.round(billableHoursYear) + ' h facturables / año';
+
+            breakdownNet.textContent = formatEuro(annualTargetNet);
+            breakdownTaxes.textContent = formatEuro(annualTaxes);
+            breakdownExpenses.textContent = formatEuro(annualExpenses);
+            breakdownMargin.textContent = formatEuro(annualMarginAmount);
+
+            // Update Proposal Modal Inputs default rate
+            document.getElementById('propRate').value = Math.ceil(recommendedHourlyRate);
+            updateProposalPreview();
+
+            // Save to LocalStorage
+            saveSettings();
+
+            // Update Graphical Chart
+            updateChart(annualTargetNet, annualTaxes, annualExpenses, annualMarginAmount);
+        }
+
+        function updateChart(net, taxes, expenses, margin) {
+            const ctx = document.getElementById('financialChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sueldo Neto', 'Impuestos (IRPF)', 'Gastos + Autónomos', 'Margen Beneficio'],
+                    datasets: [{
+                        data: [net, taxes, expenses, margin],
+                        backgroundColor: ['#10b981', '#f43f5e', '#f59e0b', '#6366f1'],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + formatEuro(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    cutout: '75%'
+                }
+            });
+        }
+
+        function openProposalModal() {
+            document.getElementById('proposalModal').classList.remove('hidden');
+            updateProposalPreview();
+        }
+
+        function closeProposalModal() {
+            document.getElementById('proposalModal').classList.add('hidden');
+        }
+
+        function updateProposalPreview() {
+            const freelance = document.getElementById('propFreelanceName').value || 'Alex Dev';
+            const client = document.getElementById('propClientName').value || 'Cliente';
+            const title = document.getElementById('propProjectTitle').value || 'Proyecto';
+            const hours = parseFloat(document.getElementById('propHours').value) || 0;
+            const rate = parseFloat(document.getElementById('propRate').value) || 0;
+            const notes = document.getElementById('propNotes').value || '';
+
+            const total = hours * rate;
+
+            document.getElementById('prevFreelance').textContent = freelance;
+            document.getElementById('prevClient').textContent = client;
+            document.getElementById('prevTitle').textContent = title;
+            document.getElementById('prevHours').textContent = hours + ' h';
+            document.getElementById('prevRate').textContent = formatEuro(rate);
+            document.getElementById('prevTotal').textContent = formatEuro(total);
+            document.getElementById('prevFinalTotal').textContent = formatEuro(total);
+            document.getElementById('prevNotes').textContent = notes;
+            document.getElementById('prevDate').textContent = new Date().toLocaleDateString('es-ES');
+        }
+
+        // Live update listeners for Proposal form
+        ['propFreelanceName', 'propClientName', 'propProjectTitle', 'propHours', 'propRate', 'propNotes'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateProposalPreview);
+        });
+
+        // Client-side PDF Download using html2pdf
+        function downloadPDF() {
+            const element = document.getElementById('pdfPaper');
+            const opt = {
+                margin:       0.5,
+                filename:     'Presupuesto_' + (document.getElementById('propClientName').value || 'Cliente').replace(/\s+/g, '_') + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function saveSettings() {
+            const settings = {
+                desiredNetMonthly: desiredNetMonthlyInput.value,
+                monthlyExpenses: monthlyExpensesInput.value,
+                cuotaAutonomos: cuotaAutonomosInput.value,
+                taxPercentage: taxPercentageInput.value,
+                vacationWeeks: vacationWeeksInput.value,
+                weeklyHours: weeklyHoursInput.value,
+                billableRatio: billableRatioInput.value,
+                profitMargin: profitMarginInput.value,
+            };
+            localStorage.setItem('freelance_calc_2026', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('freelance_calc_2026');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    if (settings.desiredNetMonthly) desiredNetMonthlyInput.value = settings.desiredNetMonthly;
+                    if (settings.monthlyExpenses) monthlyExpensesInput.value = settings.monthlyExpenses;
+                    if (settings.cuotaAutonomos) cuotaAutonomosInput.value = settings.cuotaAutonomos;
+                    if (settings.taxPercentage) taxPercentageInput.value = settings.taxPercentage;
+                    if (settings.vacationWeeks) vacationWeeksInput.value = settings.vacationWeeks;
+                    if (settings.weeklyHours) weeklyHoursInput.value = settings.weeklyHours;
+                    if (settings.billableRatio) billableRatioInput.value = settings.billableRatio;
+                    if (settings.profitMargin) profitMarginInput.value = settings.profitMargin;
+                } catch(e) {
+                    console.error("Could not parse saved settings", e);
+                }
+            }
+        }
+
+        function resetDefaults() {
+            desiredNetMonthlyInput.value = 2500;
+            monthlyExpensesInput.value = 350;
+            cuotaAutonomosInput.value = 290;
+            taxPercentageInput.value = 20;
+            vacationWeeksInput.value = 4;
+            weeklyHoursInput.value = 40;
+            billableRatioInput.value = 70;
+            profitMarginInput.value = 15;
+            calculateRates();
+        }
+
+        // Event Listeners for inputs
+        const allInputs = [
+            desiredNetMonthlyInput, monthlyExpensesInput, cuotaAutonomosInput,
+            taxPercentageInput, vacationWeeksInput, weeklyHoursInput,
+            billableRatioInput, profitMarginInput
+        ];
+
+        allInputs.forEach(input => {
+            input.addEventListener('input', calculateRates);
+        });
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadSettings();
+            calculateRates();
+        });
+    </script>
+</body>
+</html>
